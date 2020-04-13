@@ -1,65 +1,68 @@
+import logging
 from configparser import ConfigParser
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtMultimedia import QCameraInfo, QCamera
-from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtMultimedia import QCameraInfo
+from PyQt5.QtWidgets import QApplication
 from more_itertools import one
 
+from photobooth.main_window import MainWindow
+from photobooth.printer import Printer
+from photobooth.widgets.idle_widget import IdleWidget
+from photobooth.widgets.preview_widget import PreviewWidget
+from photobooth.widgets.printing_widget import PrintingWidget
 
-APPLICATION_NAME = 'photobooth'
+logger = logging.getLogger(__name__)
 
-
-class PreviewWindow(QMainWindow):
-    def __init__(self, camera_info, parent=None, flags=Qt.WindowFlags()):
-        super(PreviewWindow, self).__init__(parent, flags)
-
-        self.setWindowTitle(APPLICATION_NAME)
-
-        self.view_finder = QCameraViewfinder()
-        self.setCentralWidget(self.view_finder)
-
-        self.camera = QCamera(camera_info)
-        self.camera.setViewfinder(self.view_finder)
-        self.camera.start()
-
-    def keyPressEvent(self, event):
-        super(PreviewWindow, self).keyPressEvent(event)
-        if event.key() in [Qt.Key_Q, Qt.Key_Escape]:
-            self.deleteLater()
+APPLICATION_NAME = "photobooth"
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 
 
 def main():
-    # TODO Inject config name
+    logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG)
+
     config = ConfigParser()
-    config.read('./photobooth.cfg')
+    # TODO Inject config name
+    config.read("./photobooth.cfg")
+
+    camera_info = _find_qcamera_info(config["camera"]["deviceName"])
 
     app = QApplication([])
     app.setApplicationName(APPLICATION_NAME)
 
-    qcamera_info = find_qcamera_info(config['camera']['deviceName'])
-
-    print(qcamera_info)
-
-    w = PreviewWindow(qcamera_info)
+    w = MainWindow(
+        idle_widget=IdleWidget(camera_info),
+        preview_widget=PreviewWidget(),
+        printing_widget=PrintingWidget(),
+        printer=Printer(),
+    )
     w.showFullScreen()
 
     app.exec_()
 
 
-def find_qcamera_info(requested_device_name):
+def _find_qcamera_info(requested_device_name):
     if requested_device_name is None or requested_device_name == "":
         camera = QCameraInfo.defaultCamera()
     else:
+        matching_cameras = [
+            c
+            for c in QCameraInfo.availableCameras()
+            if c.deviceName() == requested_device_name
+        ]
         try:
-            camera = one(
-                [c for c in QCameraInfo.availableCameras() if c.deviceName() == requested_device_name],
-                too_short=IndexError
-            )
+            camera = one(matching_cameras, too_short=IndexError,)
         except ValueError as e:
-            raise ValueError(f"Multiple cameras found with given device name ({requested_device_name})") from e
+            raise ValueError(
+                f"Multiple cameras found with given device name ({requested_device_name})"
+            ) from e
         except IndexError as e:
-            available_cameras = ", ".join(c.deviceName() for c in QCameraInfo.availableCameras())
-            raise ValueError(f"No camera found with given device name ({requested_device_name}), "
-                             f"available devices: {available_cameras}") from e
+            available_cameras = ", ".join(
+                c.deviceName() for c in QCameraInfo.availableCameras()
+            )
+            raise ValueError(
+                f"No camera found with given device name ({requested_device_name}), "
+                f"available devices: {available_cameras}"
+            ) from e
+
+    logging.info("Found QCamera: %s", camera.deviceName())
     return camera
