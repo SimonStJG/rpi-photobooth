@@ -139,7 +139,7 @@ python-versions = "*"
 version = "0.6.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -332,8 +332,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "f6b0cf14b72e9b980a208f2ee7929a56200b7bab7de41746d90d55dc3b78102a"
-python-versions = "3.7.5"
+content-hash = "c47d1a596f507c500d14aa12346b4b399e5a3078f5c525ba62f6c115e1914219"
+python-versions = "3.7.7"
 
 [metadata.files]
 appdirs = [

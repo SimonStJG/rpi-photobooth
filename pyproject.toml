@@ -5,9 +5,10 @@ description = ""
 authors = ["SimonStJG <Simon.StJG@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.7.5"
+python = "3.7.7"
 PyQt5 = "^5.14.2"
 PySide2 = "^5.14.2"
+more-itertools = "^8.2.0"
 
 [tool.poetry.dev-dependencies]
 isort = "^4.3.21"
