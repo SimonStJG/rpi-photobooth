@@ -5,11 +5,13 @@ from PyQt5.QtMultimedia import QCameraInfo
 from PyQt5.QtWidgets import QApplication
 from more_itertools import one
 
-from photobooth.main_window import MainWindow
+from photobooth.main_controller import MainController
+from photobooth.ui.main_window import MainWindow
 from photobooth.printer import Printer
-from photobooth.widgets.idle_widget import IdleWidget
-from photobooth.widgets.preview_widget import PreviewWidget
-from photobooth.widgets.printing_widget import PrintingWidget
+from photobooth.ui.error_widget import ErrorWidget
+from photobooth.ui.idle_widget import IdleWidget
+from photobooth.ui.preview_widget import PreviewWidget
+from photobooth.ui.printing_widget import PrintingWidget
 
 logger = logging.getLogger(__name__)
 
@@ -29,13 +31,28 @@ def main():
     app = QApplication([])
     app.setApplicationName(APPLICATION_NAME)
 
-    w = MainWindow(
-        idle_widget=IdleWidget(camera_info),
-        preview_widget=PreviewWidget(),
-        printing_widget=PrintingWidget(),
-        printer=Printer(),
+    idle_widget = IdleWidget(camera_info)
+    preview_widget = PreviewWidget()
+    printing_widget = PrintingWidget()
+    error_widget = ErrorWidget()
+    printer = (Printer(config["printer"]),)
+
+    main_window = MainWindow(
+        idle_widget=idle_widget,
+        preview_widget=preview_widget,
+        printing_widget=printing_widget,
+        error_widget=error_widget,
     )
-    w.showFullScreen()
+    main_controller = MainController(
+        main_window=main_window,
+        idle_widget=idle_widget,
+        preview_widget=preview_widget,
+        printing_widget=printing_widget,
+        error_widget=error_widget,
+        printer=printer,
+    )
+
+    main_window.showFullScreen()
 
     app.exec_()
 
@@ -50,7 +67,7 @@ def _find_qcamera_info(requested_device_name):
             if c.deviceName() == requested_device_name
         ]
         try:
-            camera = one(matching_cameras, too_short=IndexError,)
+            camera = one(matching_cameras, too_short=IndexError)
         except ValueError as e:
             raise ValueError(
                 f"Multiple cameras found with given device name ({requested_device_name})"
