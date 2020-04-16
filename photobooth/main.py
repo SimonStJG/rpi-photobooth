@@ -1,15 +1,15 @@
 import logging
 from configparser import ConfigParser
 
+from more_itertools import one
 from PyQt5.QtMultimedia import QCameraInfo
 from PyQt5.QtWidgets import QApplication
-from more_itertools import one
 
 from photobooth.main_controller import MainController
-from photobooth.ui.main_window import MainWindow
 from photobooth.printer import Printer
 from photobooth.ui.error_widget import ErrorWidget
 from photobooth.ui.idle_widget import IdleWidget
+from photobooth.ui.main_window import MainWindow
 from photobooth.ui.preview_widget import PreviewWidget
 from photobooth.ui.printing_widget import PrintingWidget
 
@@ -43,7 +43,7 @@ def main():
         printing_widget=printing_widget,
         error_widget=error_widget,
     )
-    main_controller = MainController(
+    main_controller = MainController(  # NoQA: Unused variable
         main_window=main_window,
         idle_widget=idle_widget,
         preview_widget=preview_widget,
@@ -70,15 +70,17 @@ def _find_qcamera_info(requested_device_name):
             camera = one(matching_cameras, too_short=IndexError)
         except ValueError as e:
             raise ValueError(
-                f"Multiple cameras found with given device name ({requested_device_name})"
+                "Multiple cameras found with requested device name: "
+                f"{requested_device_name}"
             ) from e
         except IndexError as e:
             available_cameras = ", ".join(
                 c.deviceName() for c in QCameraInfo.availableCameras()
             )
             raise ValueError(
-                f"No camera found with given device name ({requested_device_name}), "
-                f"available devices: {available_cameras}"
+                "No camera found with requested device name: "
+                f"{requested_device_name}, available devices: "
+                f"{available_cameras}"
             ) from e
 
     logging.info("Found QCamera: %s", camera.deviceName())

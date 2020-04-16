@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import Qt, pyqtSignal, QEvent, pyqtSlot
+from PyQt5.QtCore import QEvent, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage
 from PyQt5.QtMultimedia import QCamera, QCameraImageCapture
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder

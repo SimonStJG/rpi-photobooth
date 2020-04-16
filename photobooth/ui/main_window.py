@@ -1,7 +1,8 @@
 import logging
 
-from PyQt5.QtCore import Qt, QEvent, pyqtSignal
+from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget
+
 from photobooth.ui.error_widget import ErrorWidget
 from photobooth.ui.idle_widget import IdleWidget
 from photobooth.ui.preview_widget import PreviewWidget

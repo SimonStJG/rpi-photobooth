@@ -1,8 +1,9 @@
 import logging
 
-import cups
-from PyQt5.QtCore import QObject, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage
+
+import cups
 
 logger = logging.getLogger(__name__)
 
@@ -76,8 +77,10 @@ class Printer(QObject):
         if printer_name is None:
             printer = self._conn.getDefault()
             if not self._printer:
+                available_printers = ", ".join(self._conn.getPrinters().values())
                 raise ValueError(
-                    "No system default printer, you need to specify a printer explicitly"
+                    "No system default printer, please specify a printer in config, "
+                    f"Available printers: {available_printers}"
                 )
         else:
             all_printers = self._conn.getPrinters()
