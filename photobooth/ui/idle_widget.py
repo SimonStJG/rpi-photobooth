@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import QEvent, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import QImage
 from PyQt5.QtMultimedia import QCamera, QCameraImageCapture
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
@@ -42,17 +42,14 @@ class IdleWidget(QCameraViewfinder):
         else:
             event.ignore()
 
-    @pyqtSlot
     def _image_captured(self, id_: int, image: QImage):
         logger.debug("imageCaptured: %s %s", id_, image)
         self.image_captured.emit(image)
 
-    @pyqtSlot
     # noinspection PyPep8Naming
     def _on_camera_error(self, QCamera_Error: int):
         self.error.emit(f"Camera error, code: {QCamera_Error}")
 
-    @pyqtSlot
     # noinspection PyPep8Naming
     def _on_capture_error(self, p_int=None, QCameraImageCapture_Error=None, p_str=None):
         self.error.emit(

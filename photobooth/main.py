@@ -35,7 +35,7 @@ def main():
     preview_widget = PreviewWidget()
     printing_widget = PrintingWidget()
     error_widget = ErrorWidget()
-    printer = (Printer(config["printer"]),)
+    printer = Printer(config["printer"])
 
     main_window = MainWindow(
         idle_widget=idle_widget,

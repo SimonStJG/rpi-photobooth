@@ -8,6 +8,7 @@ authors = ["SimonStJG <Simon.StJG@gmail.com>"]
 python = "^3.7.5"
 PyQt5 = "^5.14.2"
 more-itertools = "^8.2.0"
+pycups = "^1.9.74"
 
 [tool.poetry.dev-dependencies]
 isort = "^4.3.21"
