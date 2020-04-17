@@ -67,6 +67,18 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.4.3"
 
 [[package]]
+category = "main"
+description = "Yet another Python color library."
+name = "colorzero"
+optional = false
+python-versions = "*"
+version = "1.1"
+
+[package.extras]
+doc = ["sphinx"]
+test = ["pytest", "coverage", "mock"]
+
+[[package]]
 category = "dev"
 description = "Discover and load entry points from installed packages."
 name = "entrypoints"
@@ -99,6 +111,21 @@ version = "0.1.1"
 [package.dependencies]
 black = ">=19.3b0"
 flake8 = ">=3.0.0"
+
+[[package]]
+category = "main"
+description = "A simple interface to GPIO devices with Raspberry Pi."
+name = "gpiozero"
+optional = false
+python-versions = "*"
+version = "1.5.1"
+
+[package.dependencies]
+colorzero = "*"
+
+[package.extras]
+doc = ["sphinx"]
+test = ["pytest", "coverage", "mock"]
 
 [[package]]
 category = "dev"
@@ -321,7 +348,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "265336da1fe08d12f65916920e8d8bfed6da27b4ff8645abd81a47d6634ed4e9"
+content-hash = "2fd483344d9da163644c34d09e7dc25b39fbd4e1530d87163f49f0cdded26da8"
 python-versions = "^3.7.5"
 
 [metadata.files]
@@ -349,6 +376,10 @@ colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
+colorzero = [
+    {file = "colorzero-1.1-py2.py3-none-any.whl", hash = "sha256:e3c36d15b293de2b2f77ff54a5bd243fffac941ed0a5332d0697a6612a26a0a3"},
+    {file = "colorzero-1.1.tar.gz", hash = "sha256:acba47119b5d8555680d3cda9afe6ccc5481385ccc3c00084dd973f7aa184599"},
+]
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
@@ -359,6 +390,10 @@ flake8 = [
 ]
 flake8-black = [
     {file = "flake8-black-0.1.1.tar.gz", hash = "sha256:56f85aaa5a83f06a3f61e680e3b50f156b5e557ebdcb964d823d86f4c108b0c8"},
+]
+gpiozero = [
+    {file = "gpiozero-1.5.1-py2.py3-none-any.whl", hash = "sha256:101044038e71cec8be2fa841d4cea9e50e7962e9fb0287f465298b59e3f06594"},
+    {file = "gpiozero-1.5.1.tar.gz", hash = "sha256:ae1a8dc4e6e793ffd8f900968f3290d218052c46347fa0c0503c65fabe422e4d"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-1.6.0-py2.py3-none-any.whl", hash = "sha256:2a688cbaa90e0cc587f1df48bdc97a6eadccdcd9c35fb3f976a09e3b5016d90f"},

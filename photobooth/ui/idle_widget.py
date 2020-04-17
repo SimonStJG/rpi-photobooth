@@ -5,6 +5,8 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtMultimedia import QCamera, QCameraImageCapture
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 
+from photobooth.rpi_io import RpiIo, RpiIoQtHelper
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,7 +14,7 @@ class IdleWidget(QCameraViewfinder):
     image_captured = pyqtSignal(QImage)
     error = pyqtSignal(str)
 
-    def __init__(self, camera_info, parent=None):
+    def __init__(self, camera_info, rpi_io: RpiIo, parent=None):
         super().__init__(parent)
         self.setFocusPolicy(Qt.StrongFocus)
 
@@ -27,6 +29,9 @@ class IdleWidget(QCameraViewfinder):
 
         self._capture.imageCaptured.connect(self._image_captured)
         self._capture.error.connect(self._on_capture_error)
+
+        self._io = RpiIoQtHelper(self, rpi_io)
+        self._io.yes_button_pressed.connect(self.capture.capture)
 
         # TODO Should we wait for capture.captureAvailable() - what is this?
 

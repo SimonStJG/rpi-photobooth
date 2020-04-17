@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication
 
 from photobooth.main_controller import MainController
 from photobooth.printer import Printer
+from photobooth.rpi_io import RpiIo
 from photobooth.ui.error_widget import ErrorWidget
 from photobooth.ui.idle_widget import IdleWidget
 from photobooth.ui.main_window import MainWindow
@@ -31,10 +32,11 @@ def main():
     app = QApplication([])
     app.setApplicationName(APPLICATION_NAME)
 
-    idle_widget = IdleWidget(camera_info)
-    preview_widget = PreviewWidget()
+    rpi_io = RpiIo(config["rpiIo"])
+    idle_widget = IdleWidget(camera_info, rpi_io)
+    preview_widget = PreviewWidget(rpi_io)
     printing_widget = PrintingWidget()
-    error_widget = ErrorWidget()
+    error_widget = ErrorWidget(rpi_io)
     printer = Printer(config["printer"])
 
     main_window = MainWindow(
