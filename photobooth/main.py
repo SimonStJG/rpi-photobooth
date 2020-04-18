@@ -1,5 +1,7 @@
+import argparse
 import logging
 from configparser import ConfigParser
+from pathlib import Path
 
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication
@@ -22,12 +24,12 @@ LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 
 
 def main():
+    args = _parse_args()
+
     logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG)
     logging.getLogger("PyQt5.uic").setLevel(logging.INFO)
 
-    config = ConfigParser()
-    # TODO Inject config name
-    config.read("./photobooth.cfg")
+    config = _read_config(args.config)
 
     camera_info = find_qcamera_info(config["camera"]["deviceName"])
 
@@ -64,6 +66,25 @@ def main():
         main_window.showFullScreen()
 
         app.exec_()
+
+
+def _parse_args():
+    parser = argparse.ArgumentParser(description="Photobooth")
+    parser.add_argument("--config", help="Config file to use", default=None)
+    return parser.parse_args()
+
+
+def _read_config(requested_config_location):
+    if requested_config_location is None:
+        logger.warning("No config passed, using default config")
+        config_location = Path(__file__).parent / "default_config.cfg"
+    else:
+        logger.debug("Resolving config: %s", requested_config_location)
+        config_location = Path(requested_config_location).resolve()
+
+    config = ConfigParser()
+    config.read(str(config_location))
+    return config
 
 
 def _load_fonts():
