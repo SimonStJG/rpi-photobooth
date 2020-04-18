@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QLabel, QWidget, QGridLayout
+from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
 
 from photobooth.uic import loadUi
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins

@@ -119,11 +119,19 @@ class LibCupsPrinter(QObject):
 
 
 class MockPrinter(QObject):
+    TIMEOUT_SECONDS = 5
+
     error = pyqtSignal(str)
     success = pyqtSignal()
 
     # noinspection PyUnusedLocal
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self._timer = None
+
+    # noinspection PyUnusedLocal
     def print(self, image: QImage):
-        timer = QTimer()
-        timer.timeout.connect(self.success)
-        timer.start(1000 * 10)
+        self._timer = QTimer()
+        self._timer.singleShot(
+            MockPrinter.TIMEOUT_SECONDS * 1000, lambda: self.success.emit()
+        )

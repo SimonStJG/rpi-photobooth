@@ -1,6 +1,8 @@
+import inspect
 import logging
 from dataclasses import dataclass
 
+from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage
 
 from photobooth.printer import LibCupsPrinter
@@ -10,10 +12,18 @@ from photobooth.widgets.main_window import MainWindow
 from photobooth.widgets.preview_widget import PreviewWidget
 from photobooth.widgets.printing_widget import PrintingWidget
 
+# TODO put this in config
+ERROR_TIMEOUT_SECONDS = 60
+PREVIEW_TIMEOUT_SECONDS = 60
+
 logger = logging.getLogger(__name__)
 
 
 class MainController:
+
+    # States
+    #
+
     class Idle:
         pass
 
@@ -39,85 +49,104 @@ class MainController:
         printer: LibCupsPrinter,
     ):
         super().__init__()
-        self.main_window = main_window
-        self.idle_widget = idle_widget
-        self.preview_widget = preview_widget
-        self.printing_widget = printing_widget
-        self.error_widget = error_widget
-        self.printer = printer
+        self._main_window = main_window
+        self._idle_widget = idle_widget
+        self._preview_widget = preview_widget
+        self._printing_widget = printing_widget
+        self._error_widget = error_widget
+        self._printer = printer
+
+        self._timeout_timer = QTimer()
 
         # Connect signals
         #
 
-        self.idle_widget.error.connect(self._on_error)
-        self.idle_widget.image_captured.connect(self._idle__image_captured)
+        self._idle_widget.error.connect(
+            self._expect_state_then_switch(MainController.Idle, self._switch_to_error)
+        )
+        self._idle_widget.image_captured.connect(
+            self._expect_state_then_switch(MainController.Idle, self._switch_to_preview)
+        )
 
-        self.preview_widget.accept.connect(self._preview__accept)
-        self.preview_widget.reject.connect(self._preview__reject)
+        self._preview_widget.accept.connect(
+            self._expect_state_then_switch(
+                MainController.Preview, self._switch_to_printing
+            )
+        )
+        self._preview_widget.reject.connect(
+            self._expect_state_then_switch(MainController.Preview, self._switch_to_idle)
+        )
 
-        self.error_widget.accept.connect(self._error__accept)
+        self._printer.error.connect(
+            self._expect_state_then_switch(
+                MainController.Printing, self._switch_to_error,
+            )
+        )
+        self._printer.success.connect(
+            self._expect_state_then_switch(
+                MainController.Printing, self._switch_to_idle,
+            )
+        )
 
-        self.printer.error.connect(self._on_error)
+        self._error_widget.accept.connect(
+            self._expect_state_then_switch(MainController.Error, self._switch_to_idle)
+        )
 
-        self.main_window.quit.connect(self._main_window__quit)
+        self._main_window.quit.connect(self._main_window.deleteLater)
 
         # Initialise state
         #
 
+        self._switch_to_idle()
+
+    def _cancel_timeouts(self):
+        self._timeout_timer.stop()
+
+    def _expect_state_then_switch(self, expected_state, switch_to):
+        def _inner(*args, **kwargs):
+            caller = inspect.stack()[1][3]
+            if isinstance(self.state, expected_state):
+                logger.debug("Caught %s while in %s state", caller, self.state)
+                switch_to(*args, **kwargs)
+            else:
+                logger.warning(
+                    "Dropping unexpected %s while in %s state", caller, self.state
+                )
+
+        return _inner
+
+    def _switch_to_idle(self):
+        self._cancel_timeouts()
         self.state = MainController.Idle()
+        self._main_window.select_idle()
 
-    def _error__accept(self):
-        self.main_window.select_idle()
+    def _switch_to_preview(self, image):
+        self._cancel_timeouts()
+        self.state = MainController.Preview(image)
+        self.last_captured_image = image
+        self._preview_widget.set_image(image)
+        self._main_window.select_preview()
+        self._timeout_timer.singleShot(
+            PREVIEW_TIMEOUT_SECONDS * 1000,
+            self._expect_state_then_switch(
+                MainController.Preview, self._switch_to_idle
+            ),
+        )
 
-    def _idle__image_captured(self, image: QImage):
-        if isinstance(self.state, MainController.Idle):
-            self.state = MainController.Preview(image)
-            self.last_captured_image = image
-            self.preview_widget.set_image(image)
-            self.main_window.select_preview()
-        else:
-            logger.warning(
-                "Dropping unexpected _idle__image_captured while in %s state",
-                self.state,
-            )
+    def _switch_to_printing(self):
+        self._cancel_timeouts()
+        self.state = MainController.Printing(self.state.image)
+        self._printing_widget.set_image(self.state.image)
+        self._main_window.select_printing()
+        self._printer.print(self.state.image)
 
-    def _preview__accept(self):
-        if isinstance(self.state, MainController.Preview):
-            self.state = MainController.Printing(self.state.image)
-            self.printing_widget.set_image(self.state.image)
-            self.main_window.select_printing()
-            self.printer.print(self.state.image)
-        else:
-            logger.warning(
-                "Dropping unexpected _preview__print_image while in %s state",
-                self.state,
-            )
-
-    def _preview__reject(self):
-        if isinstance(self.state, MainController.Preview):
-            self.state = MainController.Idle()
-            self.main_window.select_idle()
-        else:
-            logger.warning(
-                "Dropping unexpected _preview__reject_image while in %s state",
-                self.state,
-            )
-
-    def _printer__success(self):
-        if isinstance(self.state, MainController.Printing):
-            self.state = MainController.Idle()
-            self.main_window.select_idle()
-        else:
-            logger.warning(
-                "Dropping unexpected _printer__success while in %s state", self.state
-            )
-
-    def _on_error(self, message: str):
+    def _switch_to_error(self, message: str):
         logger.error("_on_error: %s", message)
+        self._cancel_timeouts()
         self.state = MainController.Error(message)
-        self.main_window.select_error()
-        self.error_widget.set_message(message)
-
-    def _main_window__quit(self):
-        logger.info("_main_window__quit")
-        self.main_window.deleteLater()
+        self._main_window.select_error()
+        self._error_widget.set_message(message)
+        self._timeout_timer.singleShot(
+            ERROR_TIMEOUT_SECONDS * 1000,
+            self._expect_state_then_switch(MainController.Error, self._switch_to_idle),
+        )
