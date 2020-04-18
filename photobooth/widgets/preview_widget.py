@@ -2,26 +2,33 @@ import logging
 
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
+from photobooth.uic import loadUi
+from photobooth.widgets.grid_layout_helper import set_grid_content_margins
 
 logger = logging.getLogger(__name__)
 
 
-class PreviewWidget(QLabel):
+class PreviewWidget(QWidget):
     accept = pyqtSignal()
     reject = pyqtSignal()
 
     def __init__(self, rpi_io: RpiIo, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent, flags)
-        self.setFocusPolicy(Qt.StrongFocus)
         self._io = RpiIoQtHelper(self, rpi_io)
         self._io.yes_button_pressed.connect(self.accept)
         self._io.no_button_pressed.connect(self.reject)
 
+        loadUi("preview.ui", self)
+
+        self.previewImage = self.findChild(QLabel, "previewImage")
+
+        set_grid_content_margins(self.findChild(QGridLayout, "gridLayout"))
+
     def set_image(self, image: QImage):
-        self.setPixmap(QPixmap().fromImage(image, Qt.AutoColor))
+        self.previewImage.setPixmap(QPixmap().fromImage(image, Qt.AutoColor))
 
     def keyPressEvent(self, event: QEvent):
         super().keyPressEvent(event)

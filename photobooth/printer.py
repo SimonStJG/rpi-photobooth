@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import cups
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
@@ -6,21 +7,28 @@ from PyQt5.QtGui import QImage
 
 logger = logging.getLogger(__name__)
 
-FILENAME = "/dev/shm/photobooth.jpg"
-STATE_CHECK_TIMER_MS = 500
 
-IPP_STATES = {
-    cups.IPP_JOB_PENDING: "IPP_JOB_PENDING",
-    cups.IPP_JOB_HELD: "IPP_JOB_HELD",
-    cups.IPP_JOB_PROCESSING: "IPP_JOB_PROCESSING",
-    cups.IPP_JOB_STOPPED: "IPP_JOB_STOPPED",
-    cups.IPP_JOB_CANCELED: "IPP_JOB_CANCELED",
-    cups.IPP_JOB_ABORTED: "IPP_JOB_ABORTED",
-    cups.IPP_JOB_COMPLETED: "IPP_JOB_COMPLETED",
-}
+def printer_factory(printer_config):
+    if printer_config.getboolean("useMockPrinter"):
+        return MockPrinter()
+    else:
+        return LibCupsPrinter(printer_config)
 
 
-class Printer(QObject):
+class LibCupsPrinter(QObject):
+    FILENAME = "/dev/shm/photobooth.jpg"
+    STATE_CHECK_TIMER_MS = 500
+
+    IPP_STATES = {
+        cups.IPP_JOB_PENDING: "IPP_JOB_PENDING",
+        cups.IPP_JOB_HELD: "IPP_JOB_HELD",
+        cups.IPP_JOB_PROCESSING: "IPP_JOB_PROCESSING",
+        cups.IPP_JOB_STOPPED: "IPP_JOB_STOPPED",
+        cups.IPP_JOB_CANCELED: "IPP_JOB_CANCELED",
+        cups.IPP_JOB_ABORTED: "IPP_JOB_ABORTED",
+        cups.IPP_JOB_COMPLETED: "IPP_JOB_COMPLETED",
+    }
+
     error = pyqtSignal(str)
     success = pyqtSignal()
 
@@ -35,16 +43,22 @@ class Printer(QObject):
         )
 
         self._printer = self._find_printer(requested_printer_name)
+
+        # TODO Detect if printer online
+
         self._state_timer = QTimer()
         self._state_timer.timeout.connect(self._check_job_state)
 
         logger.info("Using printer: %s", self._printer)
 
     def print(self, image: QImage):
-        logger.debug("print: %s", image)
-        image.save(FILENAME, "jpeg")
-        self._job_id = self._conn.printFile(self._printer, FILENAME, "photobooth", {})
-        self._state_timer.start(STATE_CHECK_TIMER_MS)
+        job_name = datetime.now().strftime("photobooth-%y-%m-%d--%H-%M-%S")
+        logger.debug("print: %s", job_name)
+        image.save(LibCupsPrinter.FILENAME, "jpeg")
+        self._job_id = self._conn.printFile(
+            self._printer, LibCupsPrinter.FILENAME, job_name, {}
+        )
+        self._state_timer.start(LibCupsPrinter.STATE_CHECK_TIMER_MS)
 
     def _check_job_state(self):
         def on_error(message):
@@ -74,7 +88,9 @@ class Printer(QObject):
             elif job_state == cups.IPP_JOB_COMPLETED:
                 on_success()
             else:
-                state_name = IPP_STATES.get(job_state, "unknown job state: {job_state}")
+                state_name = LibCupsPrinter.IPP_STATES.get(
+                    job_state, f"unknown job state: {job_state}"
+                )
                 on_error(
                     f"Bad print state: {state_name}, "
                     f"message: {job_printer_state_message}"
@@ -100,3 +116,14 @@ class Printer(QObject):
                     ", ".join(all_printers.keys()),
                 ) from e
         return printer
+
+
+class MockPrinter(QObject):
+    error = pyqtSignal(str)
+    success = pyqtSignal()
+
+    # noinspection PyUnusedLocal
+    def print(self, image: QImage):
+        timer = QTimer()
+        timer.timeout.connect(self.success)
+        timer.start(1000 * 10)

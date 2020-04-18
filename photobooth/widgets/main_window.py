@@ -3,10 +3,10 @@ import logging
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget
 
-from photobooth.ui.error_widget import ErrorWidget
-from photobooth.ui.idle_widget import IdleWidget
-from photobooth.ui.preview_widget import PreviewWidget
-from photobooth.ui.printing_widget import PrintingWidget
+from photobooth.widgets.error_widget import ErrorWidget
+from photobooth.widgets.idle_widget import IdleWidget
+from photobooth.widgets.preview_widget import PreviewWidget
+from photobooth.widgets.printing_widget import PrintingWidget
 
 WINDOW_TITLE = "photobooth"
 

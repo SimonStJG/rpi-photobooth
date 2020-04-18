@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>Preview</class>
+    <widget class="QWidget" name="Preview">
+        <property name="focusPolicy">
+            <set>Qt::StrongFocus</set>
+        </property>
+        <property name="windowTitle">
+            <string>Preview</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+            <item column="0" row="0">
+                <widget class="PixmapQLabel" name="previewImage">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>PixmapQLabel</class>
+            <extends>QLabel</extends>
+            <header>.pixmap_qlabel</header>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections/>
+</ui>

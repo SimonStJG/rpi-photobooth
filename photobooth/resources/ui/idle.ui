@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>Idle</class>
+    <widget class="QWidget" name="Idle">
+        <property name="focusPolicy">
+            <set>Qt::StrongFocus</set>
+        </property>
+        <property name="windowTitle">
+            <string>Idle</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout"/>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>

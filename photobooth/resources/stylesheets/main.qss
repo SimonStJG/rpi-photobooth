@@ -1,0 +1,25 @@
+/**
+ * Main Window
+ */
+
+QMainWindow {
+    background-image: url(photobooth/resources/images/jungle-background.jpg);
+}
+
+/**
+ * Printing Widget
+ */
+QLabel#printingHeader {
+    font-family: mottertektura, sans-serif;
+    font-size: 80px;
+    color: #eeeeee;
+}
+
+/**
+ * Error Widget
+ */
+QLabel#errorMessage {
+    font-family: mottertektura, sans-serif;
+    font-size: 40px;
+    color: #eeeeee;
+}

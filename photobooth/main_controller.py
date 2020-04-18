@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 from PyQt5.QtGui import QImage
 
-from photobooth.printer import Printer
-from photobooth.ui.error_widget import ErrorWidget
-from photobooth.ui.idle_widget import IdleWidget
-from photobooth.ui.main_window import MainWindow
-from photobooth.ui.preview_widget import PreviewWidget
-from photobooth.ui.printing_widget import PrintingWidget
+from photobooth.printer import LibCupsPrinter
+from photobooth.widgets.error_widget import ErrorWidget
+from photobooth.widgets.idle_widget import IdleWidget
+from photobooth.widgets.main_window import MainWindow
+from photobooth.widgets.preview_widget import PreviewWidget
+from photobooth.widgets.printing_widget import PrintingWidget
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class MainController:
         preview_widget: PreviewWidget,
         printing_widget: PrintingWidget,
         error_widget: ErrorWidget,
-        printer: Printer,
+        printer: LibCupsPrinter,
     ):
         super().__init__()
         self.main_window = main_window
@@ -63,6 +63,7 @@ class MainController:
 
         # Initialise state
         #
+
         self.state = MainController.Idle()
 
     def _error__accept(self):

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>Form</class>
+    <widget class="QWidget" name="Error">
+        <property name="windowTitle">
+            <string>Error</string>
+        </property>
+        <property name="focusPolicy">
+            <set>Qt::StrongFocus</set>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+            <item column="0" row="0">
+                <layout class="QVBoxLayout" name="verticalLayout">
+                    <property name="sizeConstraint">
+                        <enum>QLayout::SetMaximumSize</enum>
+                    </property>
+                    <item>
+                        <widget class="QLabel" name="errorMessage">
+                            <property name="textFormat">
+                                <enum>Qt::PlainText</enum>
+                            </property>
+                            <property name="alignment">
+                                <set>Qt::AlignCenter</set>
+                            </property>
+                            <property name="wordWrap">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                    </item>
+                </layout>
+            </item>
+        </layout>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>
