@@ -8,8 +8,28 @@
         <property name="windowTitle">
             <string>Preview</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,2">
             <item column="0" row="0">
+                <widget class="QLabel" name="previewHeader">
+                    <property name="text">
+                        <string>What do you think?</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item column="0" row="1">
+                <widget class="QLabel" name="previewSubheader">
+                    <property name="text">
+                        <string>(You look great)</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item column="0" row="2">
                 <widget class="PixmapQLabel" name="previewImage">
                     <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">

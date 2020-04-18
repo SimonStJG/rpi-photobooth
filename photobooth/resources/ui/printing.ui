@@ -8,7 +8,7 @@
         <property name="windowTitle">
             <string>Printing</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QGridLayout" name="gridLayout" rowstretch="1,1">
             <item column="0" row="0">
                 <widget class="QLabel" name="printingHeader">
                     <property name="text">
