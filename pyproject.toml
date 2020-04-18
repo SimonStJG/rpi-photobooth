@@ -1,8 +1,11 @@
 [tool.poetry]
 name = "photobooth"
 version = "0.1.0"
-description = ""
+description = "Simple photobooth for Raspberry Pi"
 authors = ["SimonStJG <Simon.StJG@gmail.com>"]
+license = "GPL-3.0-or-later"
+homepage = "https://github.com/SimonStJG/rpi-photobooth"
+repository = "https://github.com/SimonStJG/rpi-photobooth.git"
 
 [tool.poetry.dependencies]
 python = "^3.7.5"
@@ -13,7 +16,6 @@ gpiozero = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
 isort = "^4.3.21"
-pytest = "^5.4.1"
 black = "^19.10b0"
 flake8-black = "^0.1.1"
 flake8 = "^3.7.9"

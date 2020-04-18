@@ -1,25 +1,24 @@
 [![Travis CI](https://travis-ci.org/SimonStJG/rpi-photobooth.svg?branch=master)](https://travis-ci.org/SimonStJG/rpi-photobooth)
 
-Installation
+Simple and minimal photobooth for Raspberry Pi, controlled by hardware buttons only (well ok technically you can use a 
+keyboard, if you really want, but it's not a nice way to control it).
 
-TODO - full description
+Influenced by [reuterbal](https://github.com/reuterbal/)'s excellent 
+[photobooth](https://github.com/reuterbal/photobooth).   
+In fact theirs is better for almost every use case, except perhaps if you want a ultra simple Raspberry Pi only 
+photobooth which can only be controlled by hardware buttons. 
 
-TODO - font licence
+# Installation
 
-TODO - licence
+On a fresh raspberry pi, run: `./rpi-install.sh`
 
-Install all the deps from https://wiki.qt.io/Building_Qt_5_from_Git#Linux.2FX11
-And libqt5multimedia5-plugins ?
- - https://packages.debian.org/jessie/libqt5multimedia5-plugins
+# Running
 
-Also:
-qtmultimedia5-dev
+Take a copy of `default-config.cfg` and update it as needed, then run:
+```
+photobooth --config my-config.cfg
+```
 
-Before running poetry install:
-poetry install --upgrade pip
+# License
 
-# Qt5 dev stuff
-
-Qt designer:
-
-sudo apt-get install qttools5-dev-tools
+Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)

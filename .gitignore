@@ -1,3 +1,5 @@
 photobooth.egg-info
 __pycache__
 .idea
+dist
+test-config.cfg
