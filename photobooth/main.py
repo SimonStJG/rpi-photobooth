@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication
 
 from photobooth.main_controller import MainController
 from photobooth.printer import Printer
-from photobooth.rpi_io import RpiIo
+from photobooth.rpi_io import rpi_io_factory
 from photobooth.ui.error_widget import ErrorWidget
 from photobooth.ui.idle_widget import IdleWidget
 from photobooth.ui.main_window import MainWindow
@@ -32,31 +32,31 @@ def main():
     app = QApplication([])
     app.setApplicationName(APPLICATION_NAME)
 
-    rpi_io = RpiIo(config["rpiIo"])
-    idle_widget = IdleWidget(camera_info, rpi_io)
-    preview_widget = PreviewWidget(rpi_io)
-    printing_widget = PrintingWidget()
-    error_widget = ErrorWidget(rpi_io)
-    printer = Printer(config["printer"])
+    with rpi_io_factory(config["rpiIo"]) as rpi_io:
+        idle_widget = IdleWidget(camera_info, rpi_io)
+        preview_widget = PreviewWidget(rpi_io)
+        printing_widget = PrintingWidget()
+        error_widget = ErrorWidget(rpi_io)
+        printer = Printer(config["printer"])
 
-    main_window = MainWindow(
-        idle_widget=idle_widget,
-        preview_widget=preview_widget,
-        printing_widget=printing_widget,
-        error_widget=error_widget,
-    )
-    main_controller = MainController(  # NoQA: Unused variable
-        main_window=main_window,
-        idle_widget=idle_widget,
-        preview_widget=preview_widget,
-        printing_widget=printing_widget,
-        error_widget=error_widget,
-        printer=printer,
-    )
+        main_window = MainWindow(
+            idle_widget=idle_widget,
+            preview_widget=preview_widget,
+            printing_widget=printing_widget,
+            error_widget=error_widget,
+        )
+        main_controller = MainController(  # NoQA: Unused variable
+            main_window=main_window,
+            idle_widget=idle_widget,
+            preview_widget=preview_widget,
+            printing_widget=printing_widget,
+            error_widget=error_widget,
+            printer=printer,
+        )
 
-    main_window.showFullScreen()
+        main_window.showFullScreen()
 
-    app.exec_()
+        app.exec_()
 
 
 def _find_qcamera_info(requested_device_name):

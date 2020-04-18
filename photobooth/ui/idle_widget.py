@@ -31,7 +31,7 @@ class IdleWidget(QCameraViewfinder):
         self._capture.error.connect(self._on_capture_error)
 
         self._io = RpiIoQtHelper(self, rpi_io)
-        self._io.yes_button_pressed.connect(self.capture.capture)
+        self._io.yes_button_pressed.connect(self._capture.capture)
 
         # TODO Should we wait for capture.captureAvailable() - what is this?
 
