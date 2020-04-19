@@ -1,27 +1,38 @@
 import logging
+from enum import Enum
 
-from PyQt5.QtCore import QEvent, Qt, pyqtSignal
+from PyQt5.QtCore import QEvent, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage
 from PyQt5.QtMultimedia import QCamera, QCameraImageCapture
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtWidgets import QGridLayout, QWidget
+from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
 from photobooth.uic import load_ui
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins
 
 logger = logging.getLogger(__name__)
+COUNTDOWN_HEADER_DEFAULT_TEXT = "Press the green button"
 
 
 class IdleWidget(QWidget):
+    class State(Enum):
+        Idle = "Idle"
+        Countdown = "Countdown"
+        AwaitingCapture = "AwaitingCapture"
+
     image_captured = pyqtSignal(QImage)
     error = pyqtSignal(str)
 
-    def __init__(self, camera_info, rpi_io: RpiIo, parent=None):
+    def __init__(self, config, camera_info, rpi_io: RpiIo, parent=None):
         super().__init__(parent)
+        self._countdown_timer_seconds = config.getint("countdownTimerSeconds")
+        self._countdown_timer_seconds_remaining = None
 
         load_ui("idle.ui", self)
         set_grid_content_margins(self)
+        self._countdown_header: QLabel = self.findChild(QLabel, "countdownHeader")
+        self._countdown_header.setText(COUNTDOWN_HEADER_DEFAULT_TEXT)
 
         # Frustratingly, I couldn't work out how to add the QCameraViewfinder
         #  to the idle.ui file, so I am adding it manually
@@ -54,10 +65,18 @@ class IdleWidget(QWidget):
         self._capture.imageCaptured.connect(self._image_captured)
         self._capture.error.connect(self._on_capture_error)
 
+        # Countdown timer
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._countdown_timer_tick)
+
         # Setup RpiIo
         #
         self._io = RpiIoQtHelper(self, rpi_io)
         self._io.yes_button_pressed.connect(self._capture_requested)
+
+        # Setup State
+        #
+        self.state = IdleWidget.State.Idle
 
     def keyPressEvent(self, event: QEvent):
         super().keyPressEvent(event)
@@ -72,15 +91,41 @@ class IdleWidget(QWidget):
             event.ignore()
 
     def _capture_requested(self):
-        # TODO (not very important) Could detect if the camera does not become
-        #   available after a set period, or transitions from available to not
-        #   available.
-        if self._capture.isAvailable():
-            self._capture.capture()
+        if self.state == IdleWidget.State.Idle:
+            # This is a bit of a bodge, but the camera does usually become available
+            #  pretty quickly
+            self.state = IdleWidget.State.Countdown
+            self._countdown_timer_seconds_remaining = self._countdown_timer_seconds
+            self._countdown_header.setText(
+                f"Get Ready: {self._countdown_timer_seconds_remaining}"
+            )
+            self._timer.start(1000)
         else:
-            logger.warning("Attempt to capture image before capture device ready")
+            logger.warning("Dropping capture request when in state: %s", self.state)
+
+    def _countdown_timer_tick(self):
+        if self.state == IdleWidget.State.Idle:
+            logger.warning("Dropping countdown tick while in idle state")
+        else:
+            self._countdown_timer_seconds_remaining -= 1
+            # TODO De-dupe
+            self._countdown_header.setText(
+                f"Get Ready: {self._countdown_timer_seconds_remaining}"
+            )
+            logger.debug(
+                "Countdown timer tick: %s", self._countdown_timer_seconds_remaining
+            )
+            if self._countdown_timer_seconds_remaining <= 0:
+                self._timer.stop()
+                self.state = IdleWidget.State.AwaitingCapture
+                self._capture.capture()
 
     def _image_captured(self, id_: int, image: QImage):
+        if self.state != IdleWidget.State.AwaitingCapture:
+            logger.warning("Unexpected image captured while in state: %s", self.state)
+        self.state = IdleWidget.State.Idle
+        self._camera.unlock()
+        self._countdown_header.setText(COUNTDOWN_HEADER_DEFAULT_TEXT)
         logger.debug("imageCaptured: %s %s", id_, image)
         self.image_captured.emit(image)
 

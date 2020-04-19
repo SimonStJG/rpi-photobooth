@@ -41,7 +41,7 @@ def main():
     with rpi_io_factory(config["rpiIo"]) as rpi_io:
         main_window = MainWindow()
 
-        idle_widget = IdleWidget(camera_info, rpi_io, parent=main_window)
+        idle_widget = IdleWidget(config["gui"], camera_info, rpi_io, parent=main_window)
         preview_widget = PreviewWidget(rpi_io, parent=main_window)
         printing_widget = PrintingWidget(parent=main_window)
         error_widget = ErrorWidget(rpi_io, parent=main_window)
@@ -67,9 +67,7 @@ def main():
         with (stylesheets_root / "main.qss").open("r") as stylesheet:
             app.setStyleSheet(stylesheet.read())
 
-        main_window.setFixedHeight(480)
-        main_window.setFixedWidth(640)
-        main_window.show()
+        main_window.showFullScreen()
 
         app.exec_()
 

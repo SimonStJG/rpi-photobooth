@@ -1,4 +1,12 @@
 /**
+ * Global
+ */
+QLabel {
+    font-family: mottertektura, sans-serif;
+    color: #eeeeee;
+}
+
+/**
  * Main Window
  */
 
@@ -7,34 +15,33 @@ QMainWindow {
 }
 
 /**
+ * Idle Widget
+ */
+QLabel#countdownHeader {
+    font-size: 80px;
+}
+
+/**
  * Preview Widget
  */
 QLabel#previewHeader {
-    font-family: mottertektura, sans-serif;
     font-size: 80px;
-    color: #eeeeee;
 }
 
 QLabel#previewSubheader {
-    font-family: mottertektura, sans-serif;
     font-size: 20px;
-    color: #eeeeee;
 }
 
 /**
  * Printing Widget
  */
 QLabel#printingHeader {
-    font-family: mottertektura, sans-serif;
     font-size: 80px;
-    color: #eeeeee;
 }
 
 /**
  * Error Widget
  */
 QLabel#errorMessage {
-    font-family: mottertektura, sans-serif;
     font-size: 40px;
-    color: #eeeeee;
 }
