@@ -12,10 +12,6 @@ from photobooth.widgets.main_window import MainWindow
 from photobooth.widgets.preview_widget import PreviewWidget
 from photobooth.widgets.printing_widget import PrintingWidget
 
-# TODO put this in config
-ERROR_TIMEOUT_SECONDS = 60
-PREVIEW_TIMEOUT_SECONDS = 60
-
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +43,7 @@ class MainController:
         printing_widget: PrintingWidget,
         error_widget: ErrorWidget,
         printer: LibCupsPrinter,
+        config,
     ):
         super().__init__()
         self._main_window = main_window
@@ -55,6 +52,8 @@ class MainController:
         self._printing_widget = printing_widget
         self._error_widget = error_widget
         self._printer = printer
+        self._error_timeout_seconds = config.getint("errorTimeoutSeconds")
+        self._preview_timeout_seconds = config.getint("previewTimeoutSeconds")
 
         self._timeout_timer = QTimer()
 
@@ -127,7 +126,7 @@ class MainController:
         self._preview_widget.set_image(image)
         self._main_window.select_preview()
         self._timeout_timer.singleShot(
-            PREVIEW_TIMEOUT_SECONDS * 1000,
+            self._preview_timeout_seconds * 1000,
             self._expect_state_then_switch(
                 MainController.Preview, self._switch_to_idle
             ),
@@ -147,6 +146,6 @@ class MainController:
         self._main_window.select_error()
         self._error_widget.set_message(message)
         self._timeout_timer.singleShot(
-            ERROR_TIMEOUT_SECONDS * 1000,
+            self._error_timeout_seconds * 1000,
             self._expect_state_then_switch(MainController.Error, self._switch_to_idle),
         )

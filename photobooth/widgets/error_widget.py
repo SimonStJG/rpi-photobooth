@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
-from photobooth.uic import loadUi
+from photobooth.uic import load_ui
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins
 
 
@@ -17,7 +17,7 @@ class ErrorWidget(QWidget):
         self._io.yes_button_pressed.connect(self.accept)
         self._io.no_button_pressed.connect(self.accept)
 
-        loadUi("error.ui", self)
+        load_ui("error.ui", self)
         set_grid_content_margins(self)
 
         self._errorMessage = self.findChild(QtWidgets.QLabel, "errorMessage")

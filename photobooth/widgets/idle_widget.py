@@ -7,7 +7,7 @@ from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtWidgets import QGridLayout, QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
-from photobooth.uic import loadUi
+from photobooth.uic import load_ui
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class IdleWidget(QWidget):
     def __init__(self, camera_info, rpi_io: RpiIo, parent=None):
         super().__init__(parent)
 
-        loadUi("idle.ui", self)
+        load_ui("idle.ui", self)
         set_grid_content_margins(self)
 
         # Frustratingly, I couldn't work out how to add the QCameraViewfinder
@@ -32,10 +32,19 @@ class IdleWidget(QWidget):
 
         # Setup camera
         #
+
+        # TODO Ideally we would capture the viewfindersettings here and reduce
+        #   the resolution so that the picture is smoother.  The docs suggest
+        #   you call load() first, capture the state change, and read the settings
+        #   then.  But when I do this gstreamer dies!
+
+        # TODO Remove the horrible black box around the viewfinder
+
         self._camera = QCamera(camera_info)
         self._camera.setViewfinder(self._view_finder)
         self._camera.setCaptureMode(QCamera.CaptureStillImage)
         self._camera.error.connect(self._on_camera_error)
+
         self._camera.start()
 
         # Setup capture

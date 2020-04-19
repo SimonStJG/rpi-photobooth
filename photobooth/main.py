@@ -61,6 +61,7 @@ def main():
             printing_widget=printing_widget,
             error_widget=error_widget,
             printer=printer,
+            config=config["gui"],
         )
 
         with (stylesheets_root / "main.qss").open("r") as stylesheet:

@@ -17,9 +17,7 @@ class MainWindow(QMainWindow):
     quit = pyqtSignal()
 
     def __init__(
-        self,
-        parent=None,
-        flags=Qt.WindowFlags(),
+        self, parent=None, flags=Qt.WindowFlags(),
     ):
         super().__init__(parent, flags)
 
@@ -28,10 +26,13 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-    def set_widgets(self, idle_widget: IdleWidget,
+    def set_widgets(
+        self,
+        idle_widget: IdleWidget,
         preview_widget: PreviewWidget,
         printing_widget: PrintingWidget,
-        error_widget: ErrorWidget):
+        error_widget: ErrorWidget,
+    ):
 
         self.central_widget.addWidget(idle_widget)
         self.central_widget.addWidget(preview_widget)

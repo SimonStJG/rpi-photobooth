@@ -2,10 +2,10 @@ import logging
 
 from PyQt5.QtCore import QEvent, Qt, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
-from photobooth.uic import loadUi
+from photobooth.uic import load_ui
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class PreviewWidget(QWidget):
         self._io.yes_button_pressed.connect(self.accept)
         self._io.no_button_pressed.connect(self.reject)
 
-        loadUi("preview.ui", self)
+        load_ui("preview.ui", self)
         set_grid_content_margins(self)
 
         self.previewImage = self.findChild(QLabel, "previewImage")
