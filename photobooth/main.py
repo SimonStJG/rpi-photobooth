@@ -81,18 +81,20 @@ def _parse_args():
 def _read_config(requested_config_location):
     if requested_config_location is None:
         logger.warning("No config passed, using default config")
-        config_location = Path(__file__).parent / "default_config.cfg"
+        config_location = str(Path(__file__).parent.parent / "default-config.cfg")
     else:
         logger.debug("Resolving config: %s", requested_config_location)
-        config_location = Path(requested_config_location).resolve()
+        config_location = str(Path(requested_config_location).resolve())
 
     config = ConfigParser()
-    config.read(str(config_location))
+    if config_location not in config.read(config_location):
+        raise ValueError("Failed to read config: %s", config_location)
+
     return config
 
 
 def _load_fonts():
     font_database = QtGui.QFontDatabase()
-    for font_location in fonts_root.glob("**/*.tff"):
+    for font_location in fonts_root.glob("**/*.ttf"):
         logger.debug("Found font: %s", font_location)
-        font_database.addApplicationFont(font_location)
+        font_database.addApplicationFont(str(font_location))

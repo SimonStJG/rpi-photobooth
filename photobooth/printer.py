@@ -52,12 +52,16 @@ class LibCupsPrinter(QObject):
         logger.info("Using printer: %s", self._printer)
 
     def print(self, image: QImage):
-        job_name = datetime.now().strftime("photobooth-%y-%m-%d--%H-%M-%S")
-        logger.debug("print: %s", job_name)
+        job_title = datetime.now().strftime("photobooth-%y-%m-%d--%H-%M-%S")
+        logger.debug("print: %s", job_title)
         image.save(LibCupsPrinter.FILENAME, "jpeg")
-        self._job_id = self._conn.printFile(
-            self._printer, LibCupsPrinter.FILENAME, job_name, {}
-        )
+        try:
+            self._job_id = self._conn.printFile(
+                self._printer, LibCupsPrinter.FILENAME, job_title, {}
+            )
+        except cups.IPPError as e:
+            logger.exception("Failed to call printFile")
+            self.error.emit(f"Print failed: {str(e)}")
         self._state_timer.start(LibCupsPrinter.STATE_CHECK_TIMER_MS)
 
     def _check_job_state(self):
@@ -80,7 +84,6 @@ class LibCupsPrinter(QObject):
 
             job_state = attribs["job-state"]
             job_printer_state_message = attribs["job-printer-state-message"]
-            print(job_state)
 
             # TODO Notice if we are IPP_JOB_PENDING for too long
             if job_state in [cups.IPP_JOB_PROCESSING, cups.IPP_JOB_PENDING]:
@@ -97,25 +100,23 @@ class LibCupsPrinter(QObject):
                 )
 
     def _find_printer(self, printer_name):
+        all_printers = self._conn.getPrinters().keys()
         if printer_name is None:
-            printer = self._conn.getDefault()
-            if not printer:
-                available_printers = ", ".join(self._conn.getPrinters().values())
+            default_printer = self._conn.getDefault()
+            if not default_printer:
+                available_printers = ", ".join(all_printers)
                 raise ValueError(
                     "No system default printer, please specify a printer in config, "
                     f"Available printers: {available_printers}"
                 )
-        else:
-            all_printers = self._conn.getPrinters()
-            try:
-                printer = all_printers[printer_name]
-            except KeyError as e:
-                raise ValueError(
-                    "Unknown printer %s, known printers are: %s",
-                    printer_name,
-                    ", ".join(all_printers.keys()),
-                ) from e
-        return printer
+            return default_printer
+        if printer_name not in all_printers:
+            raise ValueError(
+                "Unknown printer %s, known printers are: %s",
+                printer_name,
+                ", ".join(all_printers),
+            )
+        return printer_name
 
 
 class MockPrinter(QObject):

@@ -32,7 +32,12 @@ def rpi_io_factory(rpi_io_config) -> RpiIo:
     rpi_io = RpiIo()
     with button_factory(rpi_io_config["yesButtonPin"]) as yes_button:
         with button_factory(rpi_io_config["noButtonPin"]) as no_button:
-            yes_button.when_pressed = lambda: rpi_io.yes_button_pressed.emit()
+
+            def when_yes_pressed():
+                logger.warning("Yes pressed")
+                rpi_io.yes_button_pressed.emit()
+
+            yes_button.when_pressed = when_yes_pressed
             no_button.when_pressed = lambda: rpi_io.no_button_pressed.emit()
             yield rpi_io
 

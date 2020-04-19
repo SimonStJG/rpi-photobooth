@@ -24,6 +24,8 @@ class IdleWidget(QWidget):
     image_captured = pyqtSignal(QImage)
     error = pyqtSignal(str)
 
+    _trigger_capture = pyqtSignal()
+
     def __init__(self, config, camera_info, rpi_io: RpiIo, parent=None):
         super().__init__(parent)
         self._countdown_timer_seconds = config.getint("countdownTimerSeconds")
@@ -64,6 +66,8 @@ class IdleWidget(QWidget):
         self._capture.setCaptureDestination(QCameraImageCapture.CaptureToBuffer)
         self._capture.imageCaptured.connect(self._image_captured)
         self._capture.error.connect(self._on_capture_error)
+
+        self._trigger_capture.connect(self._capture.capture)
 
         # Countdown timer
         self._timer = QTimer()
@@ -118,7 +122,9 @@ class IdleWidget(QWidget):
             if self._countdown_timer_seconds_remaining <= 0:
                 self._timer.stop()
                 self.state = IdleWidget.State.AwaitingCapture
-                self._capture.capture()
+                # We do not directly trigger capture here - as the capture call
+                #   is very slow (presumably it is blocking).
+                self._trigger_capture.emit()
 
     def _image_captured(self, id_: int, image: QImage):
         if self.state != IdleWidget.State.AwaitingCapture:
