@@ -1,9 +1,18 @@
-from PyQt5.QtWidgets import QGridLayout
+import logging
 
-GRID_LAYOUT_CONTENT_MARGIN = 100
+from PyQt5.QtWidgets import QGridLayout, QWidget, QMainWindow
+
+logger = logging.getLogger(__name__)
 
 
-def set_grid_content_margins(grid_layout: QGridLayout):
+def set_grid_content_margins(widget: QWidget):
     # This is not possible via qss https://bugreports.qt.io/browse/QTBUG-22862 so this
     #   bodge will have to do.
-    grid_layout.setContentsMargins(*([GRID_LAYOUT_CONTENT_MARGIN] * 4))
+    grid_layout = widget.findChild(QGridLayout, "gridLayout")
+    parent = widget.parent()
+    if not isinstance(parent, QMainWindow):
+        raise ValueError(f"Expected parent to be instance of QMainWindow but was {parent}")
+    content_margin = min(parent.height(), parent.width()) / 8
+    logger.debug("Setting content margin: %s", content_margin)
+
+    grid_layout.setContentsMargins(*([content_margin] * 4))

@@ -39,18 +39,21 @@ def main():
     _load_fonts()
 
     with rpi_io_factory(config["rpiIo"]) as rpi_io:
-        idle_widget = IdleWidget(camera_info, rpi_io)
-        preview_widget = PreviewWidget(rpi_io)
-        printing_widget = PrintingWidget()
-        error_widget = ErrorWidget(rpi_io)
+        main_window = MainWindow()
+
+        idle_widget = IdleWidget(camera_info, rpi_io, parent=main_window)
+        preview_widget = PreviewWidget(rpi_io, parent=main_window)
+        printing_widget = PrintingWidget(parent=main_window)
+        error_widget = ErrorWidget(rpi_io, parent=main_window)
         printer = printer_factory(config["printer"])
 
-        main_window = MainWindow(
+        main_window.set_widgets(
             idle_widget=idle_widget,
             preview_widget=preview_widget,
             printing_widget=printing_widget,
             error_widget=error_widget,
         )
+
         main_controller = MainController(  # NoQA: Unused variable
             main_window=main_window,
             idle_widget=idle_widget,
@@ -63,7 +66,9 @@ def main():
         with (stylesheets_root / "main.qss").open("r") as stylesheet:
             app.setStyleSheet(stylesheet.read())
 
-        main_window.showFullScreen()
+        main_window.setFixedHeight(480)
+        main_window.setFixedWidth(640)
+        main_window.show()
 
         app.exec_()
 

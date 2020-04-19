@@ -21,13 +21,12 @@ class IdleWidget(QWidget):
         super().__init__(parent)
 
         loadUi("idle.ui", self)
-
-        grid_layout = self.findChild(QGridLayout, "gridLayout")
-        set_grid_content_margins(grid_layout)
+        set_grid_content_margins(self)
 
         # Frustratingly, I couldn't work out how to add the QCameraViewfinder
         #  to the idle.ui file, so I am adding it manually
         # TODO Could try adding it to the photobooth.widgets package
+        grid_layout = self.findChild(QGridLayout, "gridLayout")
         self._view_finder = QCameraViewfinder()
         grid_layout.addWidget(self._view_finder)
 

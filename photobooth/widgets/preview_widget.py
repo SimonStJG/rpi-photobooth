@@ -22,10 +22,9 @@ class PreviewWidget(QWidget):
         self._io.no_button_pressed.connect(self.reject)
 
         loadUi("preview.ui", self)
+        set_grid_content_margins(self)
 
         self.previewImage = self.findChild(QLabel, "previewImage")
-
-        set_grid_content_margins(self.findChild(QGridLayout, "gridLayout"))
 
     def set_image(self, image: QImage):
         self.previewImage.setPixmap(QPixmap().fromImage(image, Qt.AutoColor))

@@ -18,10 +18,6 @@ class MainWindow(QMainWindow):
 
     def __init__(
         self,
-        idle_widget: IdleWidget,
-        preview_widget: PreviewWidget,
-        printing_widget: PrintingWidget,
-        error_widget: ErrorWidget,
         parent=None,
         flags=Qt.WindowFlags(),
     ):
@@ -31,6 +27,11 @@ class MainWindow(QMainWindow):
 
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
+
+    def set_widgets(self, idle_widget: IdleWidget,
+        preview_widget: PreviewWidget,
+        printing_widget: PrintingWidget,
+        error_widget: ErrorWidget):
 
         self.central_widget.addWidget(idle_widget)
         self.central_widget.addWidget(preview_widget)
