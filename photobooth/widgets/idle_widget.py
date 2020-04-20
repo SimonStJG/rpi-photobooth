@@ -95,14 +95,12 @@ class IdleWidget(QWidget):
             event.ignore()
 
     def _capture_requested(self):
+        # This is a bit of a bodge, but the camera does usually become available pretty
+        # quickly
         if self.state == IdleWidget.State.Idle:
-            # This is a bit of a bodge, but the camera does usually become available
-            #  pretty quickly
             self.state = IdleWidget.State.Countdown
             self._countdown_timer_seconds_remaining = self._countdown_timer_seconds
-            self._countdown_header.setText(
-                f"Get Ready: {self._countdown_timer_seconds_remaining}"
-            )
+            self.set_countdown_header_from_seconds_remaining()
             self._timer.start(1000)
         else:
             logger.warning("Dropping capture request when in state: %s", self.state)
@@ -112,10 +110,7 @@ class IdleWidget(QWidget):
             logger.warning("Dropping countdown tick while in idle state")
         else:
             self._countdown_timer_seconds_remaining -= 1
-            # TODO De-dupe
-            self._countdown_header.setText(
-                f"Get Ready: {self._countdown_timer_seconds_remaining}"
-            )
+            self.set_countdown_header_from_seconds_remaining()
             logger.debug(
                 "Countdown timer tick: %s", self._countdown_timer_seconds_remaining
             )
@@ -143,4 +138,9 @@ class IdleWidget(QWidget):
     def _on_capture_error(self, p_int=None, QCameraImageCapture_Error=None, p_str=None):
         self.error.emit(
             f"Capture error: {p_int} / {QCameraImageCapture_Error} / {p_str}"
+        )
+
+    def set_countdown_header_from_seconds_remaining(self):
+        self._countdown_header.setText(
+            f"Get Ready: {self._countdown_timer_seconds_remaining}"
         )

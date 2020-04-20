@@ -2,5 +2,5 @@
 
 set -euxo pipefail
 
-poetry run black .
-poetry run isort --atomic --apply
+black .
+isort --atomic --apply

@@ -10,14 +10,29 @@ photobooth which can only be controlled by hardware buttons.
 
 # Installation
 
-On a fresh raspberry pi, run: `./rpi-install.sh`
+Tempting as it is to use a proper package manager like poetry, or even pip, in this case you probably want to avoid 
+building pyqt5 as it will take forever on a raspberry pi, and if you don't get all the dependencies installed it will 
+still build properly - but then some parts like QtMultimedia will just not work at all.
 
-# Running
+So, we're going to use the system versions of everything.  This should work on any debian based distro, including
+ Raspberry Pi: 
+```
+sudo apt install \
+    python3-pyqt5
+    python3-pyqt5.qtmultimedia \
+    python3-cups \
+    libqt5multimedia5 \
+    libqt5multimedia5-plugins
+```
 
 Take a copy of `default-config.cfg` and update it as needed, then run:
 ```
-photobooth --config my-config.cfg
+python3 -m photobooth --config my-config.cfg
 ```
+
+# Dev
+
+Install linting tools with `./dev-requirements.txt` and run with `./checks.sh`.
 
 # License
 

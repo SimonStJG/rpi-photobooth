@@ -1,7 +1,8 @@
 import logging
 
-from more_itertools import one
 from PyQt5.QtMultimedia import QCameraInfo
+
+from photobooth.utils import one
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ def find_qcamera_info(requested_device_name):
             if c.deviceName() == requested_device_name
         ]
         try:
-            camera = one(matching_cameras, too_short=IndexError)
+            camera = one(matching_cameras)
         except ValueError as e:
             raise ValueError(
                 "Multiple cameras found with requested device name: "

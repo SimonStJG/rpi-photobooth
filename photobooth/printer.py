@@ -56,6 +56,7 @@ class LibCupsPrinter(QObject):
         logger.debug("print: %s", job_title)
         image.save(LibCupsPrinter.FILENAME, "jpeg")
         try:
+            # TODO Shrink file before printing to save a bit of ink
             self._job_id = self._conn.printFile(
                 self._printer, LibCupsPrinter.FILENAME, job_title, {}
             )

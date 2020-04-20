@@ -2,15 +2,7 @@ language: python
 dist: xenial
 python:
   - "3.7.5"
-before_install:
-  - sudo apt-get update
-  # https://wiki.qt.io/Building_Qt_5_from_Git#Linux.2FX11
-  - sudo apt-get build-dep qt5-default
-  - sudo apt-get install libxcb-xinerama0-dev 
-  # qt5 build explodes without this, not clear why
-  - pip install --upgrade pip setuptools
-  - pip install poetry
 install:
-  - poetry install
+  - pip install -r dev-requirements.txt
 script:
   - ./checks.sh
