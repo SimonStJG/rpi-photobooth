@@ -3,28 +3,25 @@ from enum import Enum
 
 from PyQt5.QtCore import QEvent, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage
-from PyQt5.QtMultimedia import QCamera, QCameraImageCapture
-from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtWidgets import QGridLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QWidget
 
 from photobooth.rpi_io import RpiIo, RpiIoQtHelper
 from photobooth.uic import load_ui
 from photobooth.widgets.grid_layout_helper import set_grid_content_margins
+from photobooth.widgets.live_feed_widget import LiveFeedWidget
 
 logger = logging.getLogger(__name__)
 COUNTDOWN_HEADER_DEFAULT_TEXT = "Press the green button"
 
 
 class IdleWidget(QWidget):
-    class State(Enum):
+    class _State(Enum):
         Idle = "Idle"
         Countdown = "Countdown"
         AwaitingCapture = "AwaitingCapture"
 
     image_captured = pyqtSignal(QImage)
     error = pyqtSignal(str)
-
-    _trigger_capture = pyqtSignal()
 
     def __init__(self, config, camera_info, rpi_io: RpiIo, parent=None):
         super().__init__(parent)
@@ -33,41 +30,16 @@ class IdleWidget(QWidget):
 
         load_ui("idle.ui", self)
         set_grid_content_margins(self)
+
         self._countdown_header: QLabel = self.findChild(QLabel, "countdownHeader")
         self._countdown_header.setText(COUNTDOWN_HEADER_DEFAULT_TEXT)
 
-        # Frustratingly, I couldn't work out how to add the QCameraViewfinder
-        #  to the idle.ui file, so I am adding it manually
-        # TODO Could try adding it to the photobooth.widgets package
-        grid_layout = self.findChild(QGridLayout, "gridLayout")
-        self._view_finder = QCameraViewfinder()
-        grid_layout.addWidget(self._view_finder)
-
-        # Setup camera
+        # Setup live feed
         #
-
-        # TODO Ideally we would capture the viewfindersettings here and reduce
-        #   the resolution so that the picture is smoother.  The docs suggest
-        #   you call load() first, capture the state change, and read the settings
-        #   then.  But when I do this gstreamer dies!
-
-        # TODO Remove the horrible black box around the viewfinder
-
-        self._camera = QCamera(camera_info)
-        self._camera.setViewfinder(self._view_finder)
-        self._camera.setCaptureMode(QCamera.CaptureStillImage)
-        self._camera.error.connect(self._on_camera_error)
-
-        self._camera.start()
-
-        # Setup capture
-        #
-        self._capture = QCameraImageCapture(self._camera)
-        self._capture.setCaptureDestination(QCameraImageCapture.CaptureToBuffer)
-        self._capture.imageCaptured.connect(self._image_captured)
-        self._capture.error.connect(self._on_capture_error)
-
-        self._trigger_capture.connect(self._capture.capture)
+        self._live_feed: LiveFeedWidget = self.findChild(LiveFeedWidget, "liveFeed")
+        self._live_feed.initialize(camera_info, config["viewfinderResolution"])
+        self._live_feed.image_captured.connect(self._image_captured)
+        self._live_feed.error.connect(self.error)
 
         # Countdown timer
         self._timer = QTimer()
@@ -80,7 +52,7 @@ class IdleWidget(QWidget):
 
         # Setup State
         #
-        self.state = IdleWidget.State.Idle
+        self._state = IdleWidget._State.Idle
 
     def keyPressEvent(self, event: QEvent):
         super().keyPressEvent(event)
@@ -97,50 +69,38 @@ class IdleWidget(QWidget):
     def _capture_requested(self):
         # This is a bit of a bodge, but the camera does usually become available pretty
         # quickly
-        if self.state == IdleWidget.State.Idle:
-            self.state = IdleWidget.State.Countdown
+        if self._state == IdleWidget._State.Idle:
+            self._state = IdleWidget._State.Countdown
             self._countdown_timer_seconds_remaining = self._countdown_timer_seconds
-            self.set_countdown_header_from_seconds_remaining()
+            self._set_countdown_header_from_seconds_remaining()
+            self._live_feed.prepare()
             self._timer.start(1000)
         else:
-            logger.warning("Dropping capture request when in state: %s", self.state)
+            logger.warning("Dropping capture request when in state: %s", self._state)
 
     def _countdown_timer_tick(self):
-        if self.state == IdleWidget.State.Idle:
+        if self._state == IdleWidget._State.Idle:
             logger.warning("Dropping countdown tick while in idle state")
         else:
             self._countdown_timer_seconds_remaining -= 1
-            self.set_countdown_header_from_seconds_remaining()
+            self._set_countdown_header_from_seconds_remaining()
             logger.debug(
                 "Countdown timer tick: %s", self._countdown_timer_seconds_remaining
             )
             if self._countdown_timer_seconds_remaining <= 0:
                 self._timer.stop()
-                self.state = IdleWidget.State.AwaitingCapture
-                # We do not directly trigger capture here - as the capture call
-                #   is very slow (presumably it is blocking).
-                self._trigger_capture.emit()
+                self._state = IdleWidget._State.AwaitingCapture
+                self._live_feed.trigger_capture()
 
-    def _image_captured(self, id_: int, image: QImage):
-        if self.state != IdleWidget.State.AwaitingCapture:
-            logger.warning("Unexpected image captured while in state: %s", self.state)
-        self.state = IdleWidget.State.Idle
-        self._camera.unlock()
+    def _image_captured(self, image: QImage):
+        logger.debug("imageCaptured: %s", image)
+        if self._state != IdleWidget._State.AwaitingCapture:
+            logger.warning("Unexpected image captured while in state: %s", self._state)
+        self._state = IdleWidget._State.Idle
         self._countdown_header.setText(COUNTDOWN_HEADER_DEFAULT_TEXT)
-        logger.debug("imageCaptured: %s %s", id_, image)
         self.image_captured.emit(image)
 
-    # noinspection PyPep8Naming
-    def _on_camera_error(self, QCamera_Error: int):
-        self.error.emit(f"Camera error, code: {QCamera_Error}")
-
-    # noinspection PyPep8Naming
-    def _on_capture_error(self, p_int=None, QCameraImageCapture_Error=None, p_str=None):
-        self.error.emit(
-            f"Capture error: {p_int} / {QCameraImageCapture_Error} / {p_str}"
-        )
-
-    def set_countdown_header_from_seconds_remaining(self):
+    def _set_countdown_header_from_seconds_remaining(self):
         self._countdown_header.setText(
             f"Get Ready: {self._countdown_timer_seconds_remaining}"
         )

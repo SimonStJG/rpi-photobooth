@@ -86,7 +86,7 @@ class LibCupsPrinter(QObject):
             job_state = attribs["job-state"]
             job_printer_state_message = attribs["job-printer-state-message"]
 
-            # TODO Notice if we are IPP_JOB_PENDING for too long
+            # TODO Notice if we are IPP_JOB_PENDING or IPP_JOB_PROCESSING for too long
             if job_state in [cups.IPP_JOB_PROCESSING, cups.IPP_JOB_PENDING]:
                 pass
             elif job_state == cups.IPP_JOB_COMPLETED:

@@ -11,11 +11,12 @@ photobooth which can only be controlled by hardware buttons.
 # Installation
 
 Tempting as it is to use a proper package manager like poetry, or even pip, in this case you probably want to avoid 
-building pyqt5 as it will take forever on a raspberry pi, and if you don't get all the dependencies installed it will 
+building PyQt5 as it will take forever on a raspberry pi, and if you don't get all the dependencies installed it will 
 still build properly - but then some parts like QtMultimedia will just not work at all.
 
 So, we're going to use the system versions of everything.  This should work on any debian based distro, including
  Raspberry Pi: 
+
 ```
 sudo apt install \
     python3-pyqt5
