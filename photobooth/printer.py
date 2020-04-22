@@ -8,16 +8,17 @@ from PyQt5.QtGui import QImage
 logger = logging.getLogger(__name__)
 
 
-def printer_factory(printer_config):
+def printer_factory(printer_config, image_formatter):
     if printer_config.getboolean("useMockPrinter"):
-        return MockPrinter()
+        return MockPrinter(printer_config, image_formatter)
     else:
-        return LibCupsPrinter(printer_config)
+        return LibCupsPrinter(printer_config, image_formatter)
 
 
 class LibCupsPrinter(QObject):
     FILENAME = "/dev/shm/photobooth.jpg"
     STATE_CHECK_TIMER_MS = 500
+    MAX_TICKS_IN_PROCESSING_OR_HELD = 2 * 60 * 2  # 1 minutes
 
     IPP_STATES = {
         cups.IPP_JOB_PENDING: "IPP_JOB_PENDING",
@@ -32,8 +33,10 @@ class LibCupsPrinter(QObject):
     error = pyqtSignal(str)
     success = pyqtSignal()
 
-    def __init__(self, printer_config):
+    def __init__(self, printer_config, image_formatter):
         super().__init__()
+        self._image_formatter = image_formatter
+
         self._conn = cups.Connection()
         self._job_id = None
 
@@ -44,19 +47,18 @@ class LibCupsPrinter(QObject):
 
         self._printer = self._find_printer(requested_printer_name)
 
-        # TODO Detect if printer online
-
         self._state_timer = QTimer()
         self._state_timer.timeout.connect(self._check_job_state)
+        self._ticks_in_processing_or_held_state = None
 
         logger.info("Using printer: %s", self._printer)
 
     def print(self, image: QImage):
         job_title = datetime.now().strftime("photobooth-%y-%m-%d--%H-%M-%S")
         logger.debug("print: %s", job_title)
-        image.save(LibCupsPrinter.FILENAME, "jpeg")
+        self._image_formatter.format_image(image).save(LibCupsPrinter.FILENAME, "jpeg")
+
         try:
-            # TODO Shrink file before printing to save a bit of ink
             self._job_id = self._conn.printFile(
                 self._printer, LibCupsPrinter.FILENAME, job_title, {}
             )
@@ -86,19 +88,32 @@ class LibCupsPrinter(QObject):
             job_state = attribs["job-state"]
             job_printer_state_message = attribs["job-printer-state-message"]
 
-            # TODO Notice if we are IPP_JOB_PENDING or IPP_JOB_PROCESSING for too long
             if job_state in [cups.IPP_JOB_PROCESSING, cups.IPP_JOB_PENDING]:
-                pass
-            elif job_state == cups.IPP_JOB_COMPLETED:
-                on_success()
+                if self._ticks_in_processing_or_held_state is None:
+                    self._ticks_in_processing_or_held_state = 0
+                else:
+                    self._ticks_in_processing_or_held_state += 1
+                    if (
+                        self._ticks_in_processing_or_held_state
+                        >= LibCupsPrinter.MAX_TICKS_IN_PROCESSING_OR_HELD
+                    ):
+                        on_error(
+                            "Something has gone wrong with the printer"
+                            " - it's stuck 'processing'?"
+                        )
             else:
-                state_name = LibCupsPrinter.IPP_STATES.get(
-                    job_state, f"unknown job state: {job_state}"
-                )
-                on_error(
-                    f"Bad print state: {state_name}, "
-                    f"message: {job_printer_state_message}"
-                )
+                self._ticks_in_processing_or_held_state = None
+
+                if job_state == cups.IPP_JOB_COMPLETED:
+                    on_success()
+                else:
+                    state_name = LibCupsPrinter.IPP_STATES.get(
+                        job_state, f"unknown job state: {job_state}"
+                    )
+                    on_error(
+                        f"Bad print state: {state_name}, "
+                        f"message: {job_printer_state_message}"
+                    )
 
     def _find_printer(self, printer_name):
         all_printers = self._conn.getPrinters().keys()
@@ -122,17 +137,21 @@ class LibCupsPrinter(QObject):
 
 class MockPrinter(QObject):
     TIMEOUT_SECONDS = 5
+    FILE_PATH = "/tmp/photobooth_mock_printer.jpeg"
 
     error = pyqtSignal(str)
     success = pyqtSignal()
 
     # noinspection PyUnusedLocal
-    def __init__(self, *args, **kwargs):
+    def __init__(self, printer_config, image_formatter):
         super().__init__()
+        self._image_formatter = image_formatter
         self._timer = None
 
     # noinspection PyUnusedLocal
     def print(self, image: QImage):
+        self._image_formatter.format_image(image).save(MockPrinter.FILE_PATH)
+        logger.warning("Mock printer printed image to: %s", MockPrinter.FILE_PATH)
         self._timer = QTimer()
         self._timer.singleShot(
             MockPrinter.TIMEOUT_SECONDS * 1000, lambda: self.success.emit()

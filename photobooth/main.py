@@ -7,6 +7,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication
 
 from photobooth.camera import find_qcamera_info
+from photobooth.image_formatter import ScalingImageFormatter
 from photobooth.main_controller import MainController
 from photobooth.printer import printer_factory
 from photobooth.resources import fonts_root, stylesheets_root
@@ -45,7 +46,8 @@ def main():
         preview_widget = PreviewWidget(rpi_io, parent=main_window)
         printing_widget = PrintingWidget(parent=main_window)
         error_widget = ErrorWidget(rpi_io, parent=main_window)
-        printer = printer_factory(config["printer"])
+        image_formatter = ScalingImageFormatter(config["printer"])
+        printer = printer_factory(config["printer"], image_formatter)
 
         main_window.set_widgets(
             idle_widget=idle_widget,

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=photobooth
+Type=Application
+Exec=python3 -m photobooth
+Terminal=false
+Path=/home/pi/rpi-photobooth
+

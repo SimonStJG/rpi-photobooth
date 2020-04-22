@@ -124,5 +124,7 @@ class LiveFeedWidget(QCameraViewfinder):
 
 
 def _str_to_qsize(val):
+    if val is None or val == "":
+        return None
     (x, y) = val.split(",")
     return QSize(int(x), int(y))
