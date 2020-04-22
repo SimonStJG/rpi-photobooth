@@ -8,9 +8,6 @@ from PyQt5.QtCore import QEvent, QObject, QTimer, pyqtSignal
 logger = logging.getLogger(__name__)
 
 
-# TODO Determine debouncing interval
-
-
 class RpiIo(QObject):
     yes_button_pressed = pyqtSignal()
     no_button_pressed = pyqtSignal()
@@ -23,11 +20,12 @@ def rpi_io_factory(rpi_io_config) -> RpiIo:
         button_factory = _MockGpioZeroButton
     else:
         logger.debug("Using real gpiozero")
+        bounce_time_seconds = rpi_io_config.getfloat("bounceTimeSeconds")
         from gpiozero import Button
 
         @contextmanager
         def button_factory(*args, **kwargs):
-            yield Button(*args, **kwargs)
+            yield Button(*args, **kwargs, bounce_time=bounce_time_seconds)
 
     rpi_io = RpiIo()
     with button_factory(rpi_io_config["yesButtonPin"]) as yes_button:
