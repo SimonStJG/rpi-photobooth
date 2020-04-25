@@ -1,4 +1,5 @@
 import logging
+import uuid
 from datetime import datetime
 
 import cups
@@ -16,7 +17,7 @@ def printer_factory(printer_config, image_formatter):
 
 
 class LibCupsPrinter(QObject):
-    FILENAME = "/dev/shm/photobooth.jpg"
+    FILENAME = f"/dev/shm/photobooth-{uuid.uuid4().hex}.jpg"
     STATE_CHECK_TIMER_MS = 500
     MAX_TICKS_IN_PROCESSING_OR_HELD = 2 * 60 * 2  # 1 minutes
 
