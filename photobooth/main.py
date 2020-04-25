@@ -66,7 +66,7 @@ def main():
             config=config["gui"],
         )
 
-        with (stylesheets_root / "main.qss").open("r") as stylesheet:
+        with (stylesheets_root / config["gui"]["stylesheet"]).open("r") as stylesheet:
             app.setStyleSheet(stylesheet.read())
 
         main_window.showFullScreen()

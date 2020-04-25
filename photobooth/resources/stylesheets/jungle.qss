@@ -12,6 +12,7 @@ QLabel {
 
 QMainWindow {
     background-image: url(photobooth/resources/images/jungle-background.jpg);
+    background-position: center;
 }
 
 /**
