@@ -49,7 +49,7 @@ class LibCupsPrinter(QObject):
 
         self._state_timer = QTimer()
         self._state_timer.timeout.connect(self._check_job_state)
-        self._ticks_in_processing_or_held_state = None
+        self._ticks_elapsed = None
 
         logger.info("Using printer: %s", self._printer)
 
@@ -82,27 +82,27 @@ class LibCupsPrinter(QObject):
         if self._job_id is None:
             on_error("Vanishing job ID")
         else:
-            attribs = self._conn.getJobAttributes(self._job_id)
-            logger.debug("attribs: %s", attribs)
+            job_attributes = self._conn.getJobAttributes(self._job_id)
+            logger.debug("job_attributes: %s", job_attributes)
 
-            job_state = attribs["job-state"]
-            job_printer_state_message = attribs["job-printer-state-message"]
+            job_state = job_attributes["job-state"]
+            job_printer_state_message = job_attributes.get("job-printer-state-message")
 
             if job_state in [cups.IPP_JOB_PROCESSING, cups.IPP_JOB_PENDING]:
-                if self._ticks_in_processing_or_held_state is None:
-                    self._ticks_in_processing_or_held_state = 0
+                if self._ticks_elapsed is None:
+                    self._ticks_elapsed = 0
                 else:
-                    self._ticks_in_processing_or_held_state += 1
+                    self._ticks_elapsed += 1
                     if (
-                        self._ticks_in_processing_or_held_state
+                        self._ticks_elapsed
                         >= LibCupsPrinter.MAX_TICKS_IN_PROCESSING_OR_HELD
                     ):
                         on_error(
-                            "Something has gone wrong with the printer"
-                            " - it's stuck 'processing'?"
+                            "Print job is stuck in pending/processing"
+                            " - run out of paper?"
                         )
             else:
-                self._ticks_in_processing_or_held_state = None
+                self._ticks_elapsed = None
 
                 if job_state == cups.IPP_JOB_COMPLETED:
                     on_success()
