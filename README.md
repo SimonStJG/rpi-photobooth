@@ -41,6 +41,5 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
 
 # TODO 
 
-* Test bounce time
 * Test printing with scaling
 * Test fresh install
