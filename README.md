@@ -7,6 +7,9 @@ designed for buttons.  You definitely can't use a mouse!  And yes it will
 probably actually work on any Linux distro if you can be bothered to track 
 down the right Qt5 dependencies.) 
 
+If you'd like to see what sort of configurations are configurable, take a look
+ at [the config](default-config.cfg).
+
 # Installation
 
 1. On any Debian-ish distro, including Raspberry Pi: 
@@ -53,13 +56,11 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
 
 # TODO 
 
-* Test printing with scaling
 * Test fresh install
 * Support video mirroring (left to right)
 * Support scaling background images (right now if the background is too small
   it will be centered and repeated)
   
- 
 # Personal notes 
 
 (Some notes specific for my personal setup)
@@ -68,3 +69,5 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
 via the script on HPs website!  It will try to pull in all sorts of rubbish.
 2. Add the printer via cups in the usual way, i.e. http://localhost:631 and 
 choose driver `HP Photosmart a610, hpcups 3.18.12 (color)`.
+3. Copy over the autostarting .desktop file into the `~/.config/autostart`
+folder.
