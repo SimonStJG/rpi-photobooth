@@ -71,3 +71,13 @@ via the script on HPs website!  It will try to pull in all sorts of rubbish.
 choose driver `HP Photosmart a610, hpcups 3.18.12 (color)`.
 3. Copy over the autostarting .desktop file into the `~/.config/autostart`
 folder.
+4. Copy over the systemd service, load and enable it
+```
+sudo cp photobooth.service /lib/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl enable photobooth
+sudo systemctl start photobooth
+```
+5. Hopefully it will start, otherwise debug in the usual way (
+`sudo journalctl -xe`).
+

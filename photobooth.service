@@ -1,0 +1,17 @@
+[Unit]
+Description=Photobooth
+
+[Service]
+User=pi
+Group=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+WorkingDirectory=/home/pi/rpi-photobooth
+ExecStart=/usr/bin/python3 -m photobooth --config simon.cfg
+Restart=always
+RestartSec=2s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=graphical.target
