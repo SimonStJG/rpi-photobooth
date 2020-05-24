@@ -128,6 +128,6 @@ class _MockGpioZeroButton:
 
     def when_pressed(self):
         """
-        Emulating how gpiozero works - this will be overriden later
+        Emulating how gpiozero works - this will be overridden later
         """
         pass

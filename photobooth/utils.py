@@ -1,3 +1,6 @@
+from PyQt5.QtCore import QSize
+
+
 def one(iterable):
     as_list = list(iterable)
     length = len(as_list)
@@ -7,3 +10,14 @@ def one(iterable):
         return as_list[0]
     else:
         raise ValueError(f"Expected one element but found {length}")
+
+
+def is_none_or_empty(val):
+    if val is None or val == "":
+        return True
+    return False
+
+
+def to_qsize(val: str) -> QSize:
+    (x, y) = val.split(",")
+    return QSize(int(x), int(y))

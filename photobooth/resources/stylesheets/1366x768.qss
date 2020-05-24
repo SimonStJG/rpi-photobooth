@@ -1,0 +1,16 @@
+QWidget {
+    font-family: "mottertektura", "sans-serif";
+    color: #2c5575;
+    font-size: 80px;
+}
+
+QMainWindow {
+    background-image: url(photobooth/resources/images/1366x768-background.jpg);
+    background-position: center;
+}
+
+/* Without this there is a nasty thin white border */
+QGraphicsView {
+    border-width: 0px;
+    border-style: solid;
+}

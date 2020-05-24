@@ -8,8 +8,6 @@ from photobooth.widgets.idle_widget import IdleWidget
 from photobooth.widgets.preview_widget import PreviewWidget
 from photobooth.widgets.printing_widget import PrintingWidget
 
-WINDOW_TITLE = "photobooth"
-
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +19,7 @@ class MainWindow(QMainWindow):
     ):
         super().__init__(parent, flags)
 
-        self.setWindowTitle(WINDOW_TITLE)
+        self.setWindowTitle("Photobooth")
 
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
@@ -53,7 +51,7 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event: QEvent):
         key = event.key()
-        logger.debug("keyPressEvent: %s", key)
+        logger.info("keyPressEvent: %s", key)
 
         if key in [Qt.Key_Q]:
             event.accept()

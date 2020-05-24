@@ -60,9 +60,7 @@ class MainController:
         # Connect signals
         #
 
-        self._idle_widget.error.connect(
-            self._expect_state_then_switch(MainController.Idle, self._switch_to_error)
-        )
+        self._idle_widget.error.connect(self._switch_to_error)
         self._idle_widget.image_captured.connect(
             self._expect_state_then_switch(MainController.Idle, self._switch_to_preview)
         )
@@ -76,11 +74,7 @@ class MainController:
             self._expect_state_then_switch(MainController.Preview, self._switch_to_idle)
         )
 
-        self._printer.error.connect(
-            self._expect_state_then_switch(
-                MainController.Printing, self._switch_to_error,
-            )
-        )
+        self._printer.error.connect(self._switch_to_error)
         self._printer.success.connect(
             self._expect_state_then_switch(
                 MainController.Printing, self._switch_to_idle,
@@ -117,6 +111,7 @@ class MainController:
     def _switch_to_idle(self):
         self._cancel_timeouts()
         self.state = MainController.Idle()
+        self._idle_widget.reload()
         self._main_window.select_idle()
 
     def _switch_to_preview(self, image):
@@ -144,7 +139,7 @@ class MainController:
         self._cancel_timeouts()
         self.state = MainController.Error(message)
         self._main_window.select_error()
-        self._error_widget.set_message(message)
+        self._error_widget.set_error_message(message)
         self._timeout_timer.singleShot(
             self._error_timeout_seconds * 1000,
             self._expect_state_then_switch(MainController.Error, self._switch_to_idle),
