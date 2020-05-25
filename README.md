@@ -9,7 +9,7 @@ Features:
 * Smooth live camera preview 
 * Printing via libcups 
 * Minimal dependencies
-* * Nothing but Qt5, Qt5-Multimedia, GStreamer, and libcups for printing
+  * Nothing but Qt5, Qt5-Multimedia, cups and their respective Python bindings.
 * Option to mirror the camera left to right
 * Easy to switch out the background 
 * Mostly works
@@ -46,10 +46,11 @@ And the inside:
 
 # Installation
 
-1. On any Debian based distro, including Raspbian on Raspberry Pi: 
+1. On any Debian-based distro, including Raspbian on Raspberry Pi:
     ```
     sudo apt install \
-        python3-pyqt5
+        cups \
+        python3-pyqt5 \
         python3-pyqt5.qtmultimedia \
         python3-cups \
         libqt5multimedia5 \
@@ -96,13 +97,14 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
 
 # TODO 
 
-* Test fresh install on a raspberry pi
 * Unable to take a fresh picture without a workaround of unloading and 
   reloading the QCamera, see TODO note in `live_feed_widget.py`
 * While there is error handling for printer errors, it could be better - for
-  example we don't detect properly if the printer has run out of paper (is 
-  this even possible?).
- 
+  example we don't detect properly if:
+  * The printer has run out of paper
+  * Someone has pressed cancel on the printer
+  * Probably a wealth of other errors
+
 # Troubleshooting
 
 * If you see are seeing errors to do with the camera, first stop is to enable 
@@ -118,6 +120,9 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
 via the script on HPs website!  It will try to pull in all sorts of rubbish.
 2. Add the printer via cups in the usual way, i.e. http://localhost:631 and 
 choose driver `HP Photosmart a610, hpcups 3.18.12 (color)`.
+  * If you get a permissions error when adding a printer as the `pi` user, you
+    might be missing from the `lpadmin` group, run
+    `sudo usermod -a -G lpadmin pi`.
 3. Copy over the .desktop file into the `~/.config/autostart`
 folder - this adds an icon in the applications menu.
 4. Copy over the systemd service, reload, enable, and start it:
@@ -127,5 +132,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable photobooth
 sudo systemctl start photobooth
 ```
-5. Hopefully it will start, otherwise debug in the usual way (
-`sudo journalctl -xe`).
+This runs the Photobooth on startup and restarts it if it terminates.
+ * If it doesn't start, debug in the usual way for systemd services (
+`sudo journalctl -xe` will get you some logs).
