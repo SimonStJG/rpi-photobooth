@@ -54,6 +54,15 @@ _screen_config = {
         # Where the top left hand corner of the mask sits on the background
         "mask_offset": QPoint(518, 220),
     },
+    (800, 480): {
+        "screen_size": QSize(800, 480),
+        "stylesheet": "800x480.qss",
+        # Mask which will be applied to all images taken with the camera
+        # before display on the screen or printing
+        "mask": "800x480-mask-cropped.png",
+        # Where the top left hand corner of the mask sits on the background
+        "mask_offset": QPoint(101, 82),
+    },
 }
 
 
