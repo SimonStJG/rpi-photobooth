@@ -1,7 +1,7 @@
 QWidget {
     font-family: "mottertektura", "sans-serif";
     color: #2c5575;
-    font-size: 80px;
+    font-size: 30px;
 }
 
 QMainWindow {

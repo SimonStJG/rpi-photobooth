@@ -61,7 +61,7 @@ _screen_config = {
         # before display on the screen or printing
         "mask": "800x480-mask-cropped.png",
         # Where the top left hand corner of the mask sits on the background
-        "mask_offset": QPoint(101, 82),
+        "mask_offset": QPoint(93, 72),
     },
 }
 
