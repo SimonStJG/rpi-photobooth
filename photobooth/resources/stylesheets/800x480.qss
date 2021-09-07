@@ -1,6 +1,6 @@
 QWidget {
     font-family: "mottertektura", "sans-serif";
-    color: #ffffff;
+    color: #2c5575;
     font-size: 90px;
 }
 
