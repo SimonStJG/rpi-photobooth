@@ -21,7 +21,6 @@ class StaticImageWidget(BaseWidget):
         self._text.setAlignment(Qt.AlignCenter)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
-        text_bounding_rect_height = self.height() / 2
         self._text.setGeometry(
             QRect(
                 0,
