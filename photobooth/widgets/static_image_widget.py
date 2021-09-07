@@ -25,9 +25,9 @@ class StaticImageWidget(BaseWidget):
         self._text.setGeometry(
             QRect(
                 0,
-                self.height() - text_bounding_rect_height,
+                0,
                 self.width(),
-                text_bounding_rect_height,
+                self.height(),
             )
         )
 
