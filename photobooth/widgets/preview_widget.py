@@ -27,7 +27,7 @@ class PreviewWidget(StaticImageWidget):
         self._io.yes_button_pressed.connect(self.accept)
         self._io.no_button_pressed.connect(self.reject)
 
-        self.set_text("Press green\n to print")
+        self.set_text("Press green\n to print\n Press red\n to retake")
 
     def keyPressEvent(self, event: QKeyEvent):
         super().keyPressEvent(event)
