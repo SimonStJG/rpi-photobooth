@@ -77,7 +77,8 @@ class MainController:
         self._printer.error.connect(self._switch_to_error)
         self._printer.success.connect(
             self._expect_state_then_switch(
-                MainController.Printing, self._switch_to_idle,
+                MainController.Printing,
+                self._switch_to_idle,
             )
         )
 

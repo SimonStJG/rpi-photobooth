@@ -44,7 +44,10 @@ class IdleWidget(BaseWidget):
         # Setup live feed
         #
         self._live_feed: LiveFeedWidget = LiveFeedWidget(
-            camera, camera_config["isMirrored"], self._mask, parent=self,
+            camera,
+            camera_config["isMirrored"],
+            self._mask,
+            parent=self,
         )
         self._live_feed.setGeometry(QRect(mask_offset, self._mask.size))
         self._live_feed.image_captured.connect(self._image_captured)

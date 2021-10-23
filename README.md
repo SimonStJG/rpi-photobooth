@@ -104,6 +104,8 @@ Code licensed under GPL v3, See [LICENSE.txt](LICENSE.txt)
   * The printer has run out of paper
   * Someone has pressed cancel on the printer
   * Probably a wealth of other errors
+* Log to a file rather than stdout
+* Restart on all errors after a certain time
 
 # Troubleshooting
 

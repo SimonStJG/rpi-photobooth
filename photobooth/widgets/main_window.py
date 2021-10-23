@@ -15,7 +15,9 @@ class MainWindow(QMainWindow):
     quit = pyqtSignal()
 
     def __init__(
-        self, parent=None, flags=Qt.WindowFlags(),
+        self,
+        parent=None,
+        flags=Qt.WindowFlags(),
     ):
         super().__init__(parent, flags)
 

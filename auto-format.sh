@@ -3,4 +3,4 @@
 set -euxo pipefail
 
 black .
-isort --atomic --apply
+isort --atomic .

@@ -26,7 +26,11 @@ class LiveFeedWidget(QGraphicsView):
     initialized = pyqtSignal()
 
     def __init__(
-        self, camera: Camera, is_mirrored: bool, mask: Mask, parent=None,
+        self,
+        camera: Camera,
+        is_mirrored: bool,
+        mask: Mask,
+        parent=None,
     ):
         super().__init__(parent=parent)
         self._is_mirrored = is_mirrored
