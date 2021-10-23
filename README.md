@@ -24,25 +24,21 @@ If you'd like to see what sort of configurations are configurable, take a look
  
 # Pictures
 
-Here's my setup:
+Before and after pictures at a party, lots of photos stapled to the board the screen is mounted on by the end
 
-![Entire setup](readme_images/brains/entire-setup.png)
+![Before](readme_images/setups/before.jpg)  | ![After](readme_images/setups/after.jpg)
+:------------------------------------------:|:----------------------------------------:
 
-Some screenshots:
+With a larger PC monitor, from before I bought myself a small screen:
 
-![Screenshot of live camera preview](readme_images/screenshots/0-live-camera-preview.png)
-![Screenshot of countdown with 2](readme_images/screenshots/1-countdown-2.png)
-![Screenshot of countdown with 1](readme_images/screenshots/2-countdown-1.png)
-![Screenshot of print preview screen](readme_images/screenshots/3-press-to-print.png)
-![Screenshot of printing screen](readme_images/screenshots/4-printing.png)
+![Dev setup](readme_images/setups/dev.png)
 
-And here's some pics of the brains, from the top:
+Some screenshots of the display from when it was running on the PC monitor shown above.
 
-![Screenshot](readme_images/brains/outside.png)
-
-And the inside:
-
-![Screenshot](readme_images/brains/inside.png)
+![Screenshot of live camera preview](readme_images/screenshots/0-live-camera-preview.png) | ![Screenshot of countdown with 2](readme_images/screenshots/1-countdown-2.png)
+:----------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------:
+![Screenshot of countdown with 1](readme_images/screenshots/2-countdown-1.png)            | ![Screenshot of print preview screen](readme_images/screenshots/3-press-to-print.png)
+![Screenshot of printing screen](readme_images/screenshots/4-printing.png) | 
 
 # Installation
 
