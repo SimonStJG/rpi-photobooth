@@ -61,8 +61,16 @@ class LibCupsPrinter(QObject):
 
         try:
             self._job_id = self._conn.printFile(
-                self._printer, LibCupsPrinter.FILENAME, job_title, {}
+                self._printer,
+                LibCupsPrinter.FILENAME,
+                job_title,
+                # To adjust brightness you can pass options in here,
+                # see https://wiki.debian.org/CUPSImageManipulation#Adjusting_the_Image_Brightness
+                # e.g. {"gamma": "1250"} or {"brightness": "150"}.
+                # One day I should put this properly in the config!
+                {}
             )
+
         except cups.IPPError as e:
             logger.exception("Failed to call printFile")
             self.error.emit(f"Print failed: {str(e)}")
